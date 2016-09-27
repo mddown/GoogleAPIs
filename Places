@@ -21,7 +21,7 @@ with open(r'G:\PyDev\places.csv', 'wb') as output:
     writer = csv.writer(output, delimiter = ',')
     writer.writerow(["Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "lat", "lon"])
     
-    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.79491,-73.934975&radius=2600&type=church&key=AIzaSyDvk9GSiW0RyNoe1Kw4JdRbvOG89dl5EQo"
+    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.79491,-73.934975&radius=2600&type=church&key="
     r = requests.get(url, verify=False)
     responseJSON = r.json()
     print r.status_code
@@ -42,7 +42,7 @@ with open(r'G:\PyDev\places.csv', 'wb') as output:
     for place in places:
         csvOutput = []
         #print placeID
-        placeDetails = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + place + "&key=AIzaSyDvk9GSiW0RyNoe1Kw4JdRbvOG89dl5EQo"
+        placeDetails = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + place + "&key="
         print placeDetails
         p = requests.get(placeDetails, verify=False)
         #print p.text
