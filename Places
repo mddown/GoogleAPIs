@@ -17,10 +17,11 @@ Otherwise it works great!
 import requests
 import csv
 
-with open(r'G:\PyDev\places.csv', 'wb') as output:
+with open('output.csv', 'wb') as output:
     writer = csv.writer(output, delimiter = ',')
     writer.writerow(["Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "lat", "lon"])
     
+    # plug in your own google api key
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.79491,-73.934975&radius=2600&type=church&key="
     r = requests.get(url, verify=False)
     responseJSON = r.json()
@@ -42,6 +43,8 @@ with open(r'G:\PyDev\places.csv', 'wb') as output:
     for place in places:
         csvOutput = []
         #print placeID
+        
+        #plug in your own google api key
         placeDetails = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + place + "&key="
         print placeDetails
         p = requests.get(placeDetails, verify=False)
