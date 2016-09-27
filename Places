@@ -1,0 +1,85 @@
+'''
+Author: Matt Downing
+Date: 9/26/2016
+
+Purpose: Script queries the Google Places API and the Google Place Details API in order to write out 
+the Name, location and Hours of Operation for all places in the search radius specified in the api query string
+to a csv file.
+
+Some problems: Google Places API only returns 20 resutls per call, have to use a page next token to get the next 20,
+a total max of 60 places is the most you can get back.
+Also you must specifiy the 'place type' in the query string, so you would have to run this process for all the 
+different place types, there are alot of them.....
+
+Otherwise it works great!
+'''
+
+import requests
+import csv
+
+with open(r'G:\PyDev\places.csv', 'wb') as output:
+    writer = csv.writer(output, delimiter = ',')
+    writer.writerow(["Name", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "lat", "lon"])
+    
+    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.79491,-73.934975&radius=2600&type=church&key=AIzaSyDvk9GSiW0RyNoe1Kw4JdRbvOG89dl5EQo"
+    r = requests.get(url, verify=False)
+    responseJSON = r.json()
+    print r.status_code
+    #print responseJSON
+    print "#################################"
+
+    output = responseJSON['results']
+    #print output
+
+    places = []
+
+    for item in output:
+        placeID = item['place_id']
+        places.append(placeID)
+    
+    print places
+
+    for place in places:
+        csvOutput = []
+        #print placeID
+        placeDetails = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + place + "&key=AIzaSyDvk9GSiW0RyNoe1Kw4JdRbvOG89dl5EQo"
+        print placeDetails
+        p = requests.get(placeDetails, verify=False)
+        #print p.text
+        placesResponse = p.json()
+        #print placesResponse
+        print ""
+        #print placesResponse['result']
+        #print placesResponse['result']['name']
+        csvOutput.append(placesResponse['result']['name'])
+        
+        # not all places return opening hours
+        if 'opening_hours' not in placesResponse['result']:
+            x = ''
+            csvOutput.extend([x] * 7)
+        
+        if 'opening_hours' in placesResponse['result']:
+            x = 0
+            for days in placesResponse['result']['opening_hours']['weekday_text']:
+                day = placesResponse['result']['opening_hours']['weekday_text'][x]
+                # replace long dash with short dash, encoding error
+                day = day.replace(u'\u2013', '-')
+                day = day.split(":",1)[1]
+                #print day
+                csvOutput.append(day)
+                x = x +1
+        
+        # lat and lon
+        lat = placesResponse['result']['geometry']['location']['lat']
+        csvOutput.append(lat)  
+        lon = placesResponse['result']['geometry']['location']['lng']
+        csvOutput.append(lon)
+        
+        # write outout to csv file   
+        print csvOutput
+        writer.writerow(csvOutput)
+        
+        
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    
+print "**************************************"
